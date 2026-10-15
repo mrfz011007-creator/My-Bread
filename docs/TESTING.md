@@ -1,7 +1,7 @@
 # Pengujian dan Verifikasi My Bread
 
 ## Status awal
-Belum ada hasil tes atau build yang dikonfirmasi untuk source aplikasi, karena fondasi aplikasi belum dibuat saat dokumen ini ditulis. Jangan menganggap tes lulus hanya karena workflow atau kode sudah ditambahkan.
+Fondasi source Android dan workflow CI sudah ditambahkan. Pemeriksaan daftar GitHub Actions runs saat checkpoint mengembalikan nol workflow run; karena itu **build dan tes belum terverifikasi**. Ini belum membuktikan build gagal; hanya berarti belum ada hasil run yang dapat diperiksa saat pengecekan.
 
 ## Prinsip bukti
 Untuk setiap klaim build atau tes, catat:
@@ -30,6 +30,16 @@ Untuk setiap klaim build atau tes, catat:
 - Edit catatan lama tidak meninggalkan stok tanggal berikutnya dalam keadaan tidak valid.
 - Restore backup gagal tidak mengubah data lokal sebelumnya.
 - Build CI sukses dan artifact APK benar-benar tersedia sebelum menyatakan APK berhasil dibangun.
+
+## Status workflow awal
+Workflow: `.github/workflows/android-ci.yml`
+- Menyiapkan Java 17.
+- Memasang Gradle 8.9 menggunakan `gradle/actions/setup-gradle@v4` karena wrapper belum ada.
+- Menjalankan `gradle testDebugUnitTest`.
+- Menjalankan `gradle assembleDebug`.
+- Mengunggah `app/build/outputs/apk/debug/app-debug.apk` sebagai artifact.
+
+Status run: belum tersedia pada saat pemeriksaan checkpoint. Periksa halaman Actions lagi sebelum melanjutkan.
 
 ## Format catatan hasil
 Tambahkan catatan ringkas per commit atau milestone:
