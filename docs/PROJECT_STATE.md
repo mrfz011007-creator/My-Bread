@@ -11,7 +11,7 @@ Membangun aplikasi Android **My Bread** untuk pencatatan usaha roti yang bekerja
 - [x] Fondasi source Android awal ditambahkan: konfigurasi Gradle, manifest, Activity, dan layout XML.
 - [x] Workflow GitHub Actions awal ditambahkan untuk tes unit, build APK debug, dan unggah artifact.
 - [ ] Gradle Wrapper belum ditambahkan; workflow sementara memasang Gradle 8.9 melalui action resmi.
-- [ ] Hasil workflow belum terverifikasi. Pemeriksaan API saat checkpoint belum menunjukkan workflow run.
+- [ ] Workflow CI sudah terpicu, tetapi run yang terlihat masih berstatus berjalan; hasil akhir belum diverifikasi.
 - [ ] APK belum dikonfirmasi berhasil dibangun atau diuji pada perangkat.
 - [ ] Database, aturan stok/FIFO, pengeluaran, riwayat, laporan, dan backup belum diimplementasikan.
 
@@ -39,7 +39,6 @@ Keputusan teknis dapat direvisi bila ada alasan yang jelas, tetapi revisi harus 
 7. Perbarui dokumen checkpoint ini setelah perubahan diverifikasi.
 
 ## Langkah berikutnya
-1. Periksa mengapa workflow belum terlihat di daftar run dan pastikan GitHub Actions aktif untuk repository.
-2. Dapatkan bukti tes unit dan APK artifact dari CI; perbaiki build bila gagal.
-3. Tambahkan Gradle Wrapper setelah jalur bootstrap tersedia, lalu ubah CI untuk menggunakan `./gradlew`.
-4. Lanjutkan ke skema database dan aturan usaha sesuai `ROADMAP.md`.
+1. Periksa hasil akhir run CI yang sedang berjalan dan perbaiki kegagalan bila ada.
+2. Tambahkan Gradle Wrapper setelah jalur bootstrap tersedia, lalu ubah CI untuk menggunakan `./gradlew`.
+3. Lanjutkan ke skema database dan aturan usaha sesuai `ROADMAP.md`.
