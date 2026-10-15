@@ -1,7 +1,7 @@
 # Pengujian dan Verifikasi My Bread
 
 ## Status awal
-Fondasi source Android dan workflow CI sudah ditambahkan. Pemeriksaan daftar GitHub Actions runs saat checkpoint mengembalikan nol workflow run; karena itu **build dan tes belum terverifikasi**. Ini belum membuktikan build gagal; hanya berarti belum ada hasil run yang dapat diperiksa saat pengecekan.
+Fondasi source Android dan workflow CI sudah ditambahkan. GitHub Actions telah membuat beberapa workflow run untuk commit terbaru, tetapi saat pemeriksaan terakhir run yang terlihat masih berstatus berjalan. Karena itu **hasil build, tes, dan artifact belum terverifikasi**.
 
 ## Prinsip bukti
 Untuk setiap klaim build atau tes, catat:
@@ -39,7 +39,7 @@ Workflow: `.github/workflows/android-ci.yml`
 - Menjalankan `gradle assembleDebug`.
 - Mengunggah `app/build/outputs/apk/debug/app-debug.apk` sebagai artifact.
 
-Status run: belum tersedia pada saat pemeriksaan checkpoint. Periksa halaman Actions lagi sebelum melanjutkan.
+Status run: sudah terpicu, tetapi hasil akhir belum tersedia pada saat checkpoint terakhir. Periksa halaman Actions sebelum melanjutkan.
 
 ## Format catatan hasil
 Tambahkan catatan ringkas per commit atau milestone:
