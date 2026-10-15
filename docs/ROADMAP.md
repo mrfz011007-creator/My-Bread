@@ -5,14 +5,16 @@ Roadmap ini adalah urutan kerja dan kriteria penerimaan. Tugas tidak dianggap se
 ## Milestone 00 — Spesifikasi dan fondasi
 - [x] Catat spesifikasi awal dan aturan bisnis.
 - [x] Tetapkan checkpoint dan prosedur melanjutkan pekerjaan.
-- [ ] Buat struktur proyek Android minimal menggunakan Java dan XML.
-- [ ] Siapkan Gradle Wrapper dan konfigurasi Android Gradle Plugin yang kompatibel.
-- [ ] Tambahkan tes dasar dan workflow GitHub Actions.
-- [ ] Buktikan build serta tes berhasil di CI.
-**Selesai jika:** source project tersedia di repository, workflow berjalan, tes lulus, dan log/artifact menunjukkan hasil aktual.
+- [x] Buat struktur proyek Android minimal menggunakan Java dan XML.
+- [x] Tambahkan konfigurasi Gradle awal.
+- [x] Tambahkan workflow GitHub Actions untuk tes, build APK, dan unggah artifact.
+- [ ] Tambahkan Gradle Wrapper; saat ini workflow memasang Gradle 8.9 secara langsung.
+- [ ] Buktikan tes dan build berhasil di CI.
+**Status:** sebagian besar fondasi source sudah dibuat, tetapi milestone belum selesai karena wrapper dan bukti CI belum ada.
+**Selesai jika:** source project tersedia, wrapper terkonfigurasi, workflow berjalan, tes lulus, dan log/artifact menunjukkan hasil aktual.
 
 ## Milestone 01 — Build APK berulang
-- [ ] Workflow dapat membangun APK dari repository bersih.
+- [ ] Workflow dapat membangun APK dari keadaan repository yang bersih.
 - [ ] APK debug diunggah sebagai artifact GitHub Actions.
 - [ ] Nama artifact dan petunjuk pengambilan APK didokumentasikan.
 - [ ] Build dapat diulang tanpa bergantung pada file lokal yang tidak dilacak Git.
