@@ -1,28 +1,34 @@
 # Pengujian dan Verifikasi My Bread
 
-## Bukti CI dasar
-- [Run #6 pada main](https://github.com/mrfz011007-creator/My-Bread/actions/runs/38818735292): sukses; unit test, build APK debug, dan unggah artifact.
-- [Run #7 pada feature/business-calculations](https://github.com/mrfz011007-creator/My-Bread/actions/runs/38994628719): sukses; kalkulator/FIFO, build APK debug, dan unggah artifact.
-- [Run #8 pada main](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39043933306): sukses; branch main setelah merge kalkulator/FIFO.
-- [Run #9 pada build/gradle-wrapper-8.9](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39044127980): sukses untuk perubahan wrapper/CI saja. Bukti ini bukan validasi kode database/UI setelah perubahan berikutnya.
+## Hasil yang sudah diverifikasi
+- [Run #7 — calculator/FIFO branch](https://github.com/mrfz011007-creator/My-Bread/actions/runs/38994628719): sukses.
+- [Run #8 — main setelah merge calculator/FIFO](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39043933306): sukses.
+- [Run #9 — Gradle Wrapper dan CI](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39044127980): sukses.
+- [Run #12 — integrasi database dan UI pada PR](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39044479692): 22 tes, 0 failure/error, build, pemeriksaan APK, dan artifact berhasil.
+- [Run #13 — main setelah merge fitur offline MVP](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39044589655): 22 tes, 0 failure/error, build dan artifact berhasil.
+- [Run #14 — validasi form dan privasi backup](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39044930209): **26 tes, 0 failure, 0 error, 0 skipped**, build dan artifact berhasil.
+- [Run #15 — main setelah merge final](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39045025354): **26 tes, 0 failure, 0 error, 0 skipped**; build APK, pemeriksaan APK, dan unggah artifact berhasil.
 
-## Workflow sekarang
+## Prosedur CI
 - Java 17.
-- Gradle Wrapper 8.9 di-commit ke repository.
-- Menjalankan `./gradlew --no-daemon --console=plain testDebugUnitTest`.
-- Memeriksa laporan XML agar jumlah tes tidak nol dan tidak ada failure/error.
-- Menjalankan `./gradlew --no-daemon --console=plain assembleDebug`.
-- Memastikan APK tidak kosong, arsip ZIP APK valid, dan `classes.dex` tersedia.
-- Mengunggah `app-debug.apk` sebagai artifact selama 14 hari.
+- Gradle Wrapper 8.9.
+- `./gradlew --no-daemon --console=plain testDebugUnitTest`.
+- Memastikan laporan JUnit XML ada, jumlah tes tidak nol, dan tidak ada failure/error.
+- `./gradlew --no-daemon --console=plain assembleDebug`.
+- Memastikan APK tidak kosong, arsip valid, dan `classes.dex` ada.
+- Mengunggah artifact bernama `My-Bread-debug-apk` selama 14 hari.
 
-## Cakupan tes pada branch integrasi
-1. Hitungan modal, omzet, margin, expense total, batas input, dan overflow.
-2. FIFO untuk stok lama, stok baru, serta penyesuaian stok bertanda.
-3. SQLite: menyimpan beberapa item pengeluaran dan penyesuaian stok.
-4. Edit catatan lama mengubah stok awal hari-hari berikutnya secara atomik.
-5. Edit yang membuat stok lanjutan tidak cukup harus rollback tanpa mengubah data sebelumnya.
-6. Backup/restore berhasil dan backup tidak valid ditolak sebelum data lama diganti.
-7. Build bersih menghasilkan APK yang valid dan artifact yang dapat diunduh.
+## Cakupan tes
+1. Perhitungan modal, omzet, margin, pengeluaran, input batas, dan overflow.
+2. FIFO, stok lama/baru, dan penyesuaian bertanda.
+3. SQLite: penyimpanan catatan, banyak pengeluaran, dan penyesuaian.
+4. Edit historis menghitung ulang stok awal hari berikutnya secara atomik.
+5. Edit historis yang membuat stok berikutnya tidak cukup membatalkan transaksi.
+6. Backup valid, pemulihan, serta penolakan backup tidak valid tanpa mengganti data lama.
+7. UI: simpan dinonaktifkan untuk catatan baru yang belum berubah, record edit tanpa perubahan, kuantitas invalid, dan pengeluaran tidak lengkap.
 
-## Kriteria penerimaan
-Catat SHA commit, status workflow, hasil unit test, hasil build, dan tautan artifact. Build hanya dinyatakan berhasil bila langkah build dan pemeriksaan APK lulus serta artifact tersedia. APK belum dianggap teruji pada perangkat sampai alur utama diuji di HP Android.
+## Status yang belum bisa dibuktikan otomatis
+APK belum diuji manual pada perangkat Android. Pemeriksaan CI hanya membuktikan unit test, build, struktur APK, dan unggah artifact; bukan jaminan semua interaksi UI sesuai kebutuhan di HP.
+
+## Catatan artifact
+Artifact run #15: `My-Bread-debug-apk`, tersedia hingga 31 Oktober 2026. Buka run di atas dan unduh artifact pada bagian Artifacts.

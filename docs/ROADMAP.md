@@ -1,57 +1,57 @@
 # Roadmap My Bread
 
-Tugas tidak dianggap selesai hanya karena source ditulis. Verifikasi dengan CI, tes yang sesuai, dan pemeriksaan APK.
+Status diperbarui 17 Oktober 2026. Sebuah fitur dianggap lengkap dari sisi kode ketika tes yang sesuai lulus di CI; kesiapan rilis tetap memerlukan uji perangkat.
 
-## Milestone 00 — Fondasi dan CI
-- [x] Spesifikasi, keputusan, dan roadmap terdokumentasi.
-- [x] Fondasi Android Java dan workflow Android CI.
-- [x] Build/tes awal terverifikasi pada run #6, #7, dan #8.
-- [x] Gradle Wrapper 8.9 masuk repository dan CI berjalan melalui `./gradlew`.
-- [ ] CI untuk integrasi database/UI terbaru lulus.
-**Selesai jika:** workflow checkout bersih menjalankan wrapper, semua tes lulus, APK tervalidasi, dan artifact tersedia.
+## Milestone 00 — Fondasi dan build berulang
+- [x] Spesifikasi, keputusan, dan checkpoint.
+- [x] Android Java/Views dan Gradle Wrapper 8.9.
+- [x] GitHub Actions menjalankan unit test, memeriksa laporan JUnit, membangun APK, memvalidasi isi APK, dan mengunggah artifact.
+- [x] Run #15 di `main` sukses untuk commit `eb22946770ba1563aac9a5490ff037e9178e360e`.
 
-## Milestone 01 — Perhitungan usaha dan FIFO
-- [x] Modal, omzet, margin kotor, pengeluaran, selisih kas.
-- [x] FIFO untuk roti terjual dan rusak.
-- [x] Penyesuaian stok dicatat terpisah dari penjualan/kerusakan.
-- [x] Tes unit termasuk kondisi batas.
-- [ ] Verifikasi ulang di CI setelah integrasi database.
+## Milestone 01 — Kalkulasi dan stok FIFO
+- [x] Modal dihitung dari seluruh roti baru yang dibawa.
+- [x] Omzet, margin kotor, pengeluaran, dan selisih kas dihitung.
+- [x] FIFO berlaku untuk penjualan dan roti rusak.
+- [x] Penyesuaian stok terpisah dari penjualan/kerusakan.
+- [x] Tes unit dan kasus batas lulus di CI.
 
 ## Milestone 02 — Database dan integritas
-- [x] Tabel SQLite untuk catatan harian, pengeluaran, dan penyesuaian stok.
-- [x] Upsert dan penyimpanan atomik.
-- [x] Edit catatan lama menghitung ulang stok awal tanggal berikutnya.
-- [x] Rollback jika perubahan membuat catatan berikutnya tidak valid.
-- [x] Tes Robolectric untuk integritas, cascading stock, rollback, dan backup.
-- [ ] Semua tes lulus di CI untuk commit terbaru.
+- [x] SQLite untuk catatan harian, pengeluaran, dan penyesuaian.
+- [x] Upsert per tanggal dan perubahan atomik.
+- [x] Perhitungan ulang opening stock setelah edit historis.
+- [x] Rollback ketika perubahan membuat stok hari berikutnya tidak cukup.
+- [x] Tes database Robolectric lulus.
 
 ## Milestone 03 — Pencatatan dan dashboard
-- [x] Dashboard dengan ringkasan uang, stok, dan grafik omzet 7 hari.
-- [x] Formulir harian dengan pratinjau langsung dan pengeluaran terpisah.
-- [x] Beberapa penyesuaian stok beserta alasan.
-- [ ] Uji input dan pengalaman penggunaan di HP.
+- [x] Dashboard ringkasan uang dan stok.
+- [x] Grafik omzet tujuh hari.
+- [x] Formulir harian dengan pratinjau langsung, pengeluaran berulang, dan penyesuaian stok.
+- [x] Tombol simpan nonaktif bila input invalid atau data tidak berubah.
+- [ ] Uji kegunaan dan input pada HP.
 
 ## Milestone 04 — Riwayat dan laporan
-- [x] Riwayat harian dan alur edit berdasarkan tanggal.
-- [x] Ringkasan bulanan serta grafik omzet.
-- [ ] Uji edit tanggal lama dan stok berantai di HP.
+- [x] Riwayat catatan serta edit harian.
+- [x] Peringatan saat edit historis memengaruhi hari berikutnya.
+- [x] Ringkasan laporan bulanan dan grafik.
+- [ ] Uji edit historis/stock chain pada HP.
 
 ## Milestone 05 — Backup dan pemulihan
 - [x] Ekspor JSON.
-- [x] Validasi backup, pratinjau dan konfirmasi sebelum penggantian data.
-- [x] Pemulihan dalam transaksi dan tes backup valid/rusak.
-- [ ] Uji impor/ekspor melalui pemilih berkas Android.
+- [x] Validasi file dan pratinjau sebelum impor.
+- [x] Konfirmasi sebelum mengganti semua data lokal.
+- [x] Pemulihan dengan transaksi dan tes untuk backup invalid.
+- [x] Android system backup dinonaktifkan supaya alur cadangan dikelola eksplisit melalui aplikasi.
+- [ ] Uji pemilih berkas, ekspor, dan impor di HP.
 
-## Milestone 06 — Audit akhir
-- [ ] CI untuk seluruh perubahan terbaru sukses.
-- [ ] Artifact APK ada dan isinya tervalidasi.
-- [ ] APK berhasil dipasang dan diuji di perangkat Android.
-- [ ] Catat batasan dan hasil aktual di checkpoint.
-- [ ] Gabungkan integrasi database/UI ke `main` setelah CI sukses dan perubahan diperiksa.
+## Milestone 06 — Verifikasi akhir
+- [x] PR kalkulasi/FIFO, wrapper/CI, offline MVP, dan validasi form telah digabung ke `main`.
+- [x] Run #15 pada `main`: 26 tes lulus, APK debug dibangun, pemeriksaan isi APK lulus, artifact diunggah.
+- [ ] Pasang dan uji APK pada perangkat Android.
+- [ ] Selesaikan masalah UX atau integrasi yang hanya terlihat pada perangkat sebelum menyatakan siap rilis.
 
-## Batasan proyek
-- Offline-first dengan data lokal.
-- Jangan menyimpan rahasia ke repo.
+## Batasan tetap
+- Offline-first dengan database lokal.
+- Jangan menaruh rahasia di repository.
 - Jangan mengubah proyek RotiKu.
-- Harga default: modal Rp1.400, jual Rp2.500, margin kotor awal Rp1.100.
-- Selisih kas bukan laba bersih jika stok belum terjual masih ada.
+- Harga awal: modal Rp1.400, jual Rp2.500, margin kotor awal Rp1.100.
+- Selisih kas bukan laba bersih selama masih ada stok yang belum terjual.
