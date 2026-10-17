@@ -29,6 +29,13 @@ public class BreadBusinessCalculatorTest {
                 BreadBusinessCalculator.calculateExpenseTotal(Collections.<Long>emptyList()));
     }
 
+    @Test
+    public void zeroQuantitiesAreValid() {
+        BreadBusinessCalculator.validateDailyQuantities(0, 0, 0, 0);
+        assertEquals(0L, BreadBusinessCalculator.calculateModal(0));
+        assertEquals(0L, BreadBusinessCalculator.calculateRevenue(0));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void rejectsNegativeNewBreadQuantity() {
         BreadBusinessCalculator.calculateModal(-1);
@@ -37,6 +44,21 @@ public class BreadBusinessCalculatorTest {
     @Test(expected = IllegalArgumentException.class)
     public void rejectsNegativeExpense() {
         BreadBusinessCalculator.calculateExpenseTotal(Arrays.asList(1_000L, -1L));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsNullExpenseList() {
+        BreadBusinessCalculator.calculateExpenseTotal(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsNullExpenseEntry() {
+        BreadBusinessCalculator.calculateExpenseTotal(Arrays.asList(1_000L, null));
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void rejectsOverflowingExpenseTotal() {
+        BreadBusinessCalculator.calculateExpenseTotal(Arrays.asList(Long.MAX_VALUE, 1L));
     }
 
     @Test(expected = IllegalArgumentException.class)

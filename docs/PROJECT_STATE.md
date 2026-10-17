@@ -1,44 +1,38 @@
 # Status Proyek My Bread
 
-Terakhir diperbarui: 2026-10-16
+Terakhir diperbarui: 2026-10-17
 
 ## Tujuan
-Membangun aplikasi Android **My Bread** untuk pencatatan usaha roti yang bekerja offline dan menyimpan data secara lokal. Repository ini terpisah dari proyek RotiKu; jangan mengubah repository atau file RotiKu.
+Aplikasi Android offline untuk pencatatan usaha roti. Data disimpan lokal. Repository ini terpisah dari RotiKu; jangan mengubah repository atau file RotiKu.
 
-## Status saat checkpoint
-- [x] Repository GitHub tersedia: `mrfz011007-creator/My-Bread`.
-- [x] Spesifikasi awal, roadmap, kebijakan pengujian, dan keputusan dicatat dalam dokumentasi.
-- [x] Fondasi source Android awal ditambahkan: konfigurasi Gradle, manifest, Activity, dan layout XML.
-- [x] Workflow GitHub Actions awal ditambahkan untuk tes unit, build APK debug, dan unggah artifact.
-- [ ] Gradle Wrapper belum ditambahkan; workflow sementara memasang Gradle 8.9 melalui action resmi.
-- [ ] Workflow CI sudah terpicu, tetapi run yang terlihat masih berstatus berjalan; hasil akhir belum diverifikasi.
-- [ ] APK belum dikonfirmasi berhasil dibangun atau diuji pada perangkat.
-- [ ] Database, aturan stok/FIFO, pengeluaran, riwayat, laporan, dan backup belum diimplementasikan.
+## Bukti build sebelumnya
+- [x] GitHub Actions run #6 pada `main` sukses; tes, build APK debug, dan unggah artifact berhasil.
+- [x] GitHub Actions run #7 pada `feature/business-calculations` sukses; kalkulator/FIFO, build APK debug, dan unggah artifact berhasil.
+- [x] PR #1 (kalkulator bisnis + FIFO) telah digabung ke `main` setelah CI sukses.
+- [x] PR #2 menambahkan Gradle Wrapper 8.9 dan pemeriksaan laporan hasil unit test.
+- [ ] Build/tes untuk integrasi database dan UI masih menunggu run CI terbaru.
+- [ ] APK belum diuji manual pada HP.
 
-**Penting:** status di atas adalah catatan kondisi yang diketahui. Jangan menyebut build, tes, APK, atau fitur berhasil sebelum ada bukti hasil yang dapat diperiksa.
+## Teknologi
+- Java dan Android Views; sumber daya XML untuk konfigurasi/layout.
+- SQLite lokal melalui `SQLiteOpenHelper`.
+- Android Gradle Plugin 8.7.3, compileSdk 35, minSdk 23, targetSdk 28, Java 17.
+- Gradle Wrapper 8.9 telah ditambahkan ke repo. Versi 8.9 sesuai dengan AGP 8.7.3.
+- JUnit dan Robolectric untuk pengujian bisnis serta database tanpa emulator fisik.
+- Tidak ada backend, login, Firebase, Kotlin, Jetpack Compose, atau API AI.
 
-## Struktur teknis awal
-- Bahasa: Java.
-- Antarmuka: layout XML Android.
-- Penyimpanan yang direncanakan: SQLite lokal; belum diimplementasikan.
-- Build: Gradle; saat ini workflow memakai Gradle 8.9 yang dipasang oleh action karena Gradle Wrapper belum tersedia.
-- CI: `.github/workflows/android-ci.yml` menjalankan tes unit, build APK debug, dan mengunggah APK sebagai artifact.
-- Package aplikasi: `com.fariz.mybread`.
-- Konfigurasi awal: compile SDK 35, min SDK 23, target SDK 28, Java 17.
-- Target awal: offline-first, tanpa akun, backend, Firebase, Kotlin, Jetpack Compose, atau API AI.
+## Implementasi pada branch kerja integrasi
+- Kalkulasi modal, omzet, margin kotor, pengeluaran, selisih kas, FIFO, dan penyesuaian stok.
+- Database SQLite untuk catatan tanggal, beberapa pengeluaran, dan beberapa penyesuaian stok.
+- Penyimpanan atomik/upsert per tanggal; perubahan tanggal lama mengalirkan ulang stok awal hari berikutnya di dalam transaksi.
+- Bila edit historis membuat data stok sesudahnya tidak valid, transaksi dibatalkan agar data sebelumnya tetap utuh.
+- Dashboard, formulir harian dengan pratinjau, riwayat, laporan bulanan, grafik omzet 7 hari, ekspor JSON, dan pemulihan setelah validasi/pratinjau/konfirmasi.
+- Tes unit untuk kalkulator/FIFO dan tes Robolectric untuk simpan-baca, perubahan stok berantai, rollback, serta backup/restore.
+- Implementasi baru belum boleh dianggap terverifikasi sampai CI untuk commit baru sukses dan artifact tersedia.
 
-Keputusan teknis dapat direvisi bila ada alasan yang jelas, tetapi revisi harus dicatat di `DECISIONS.md`.
-
-## Cara melanjutkan di sesi baru
-1. Baca `PROJECT_STATE.md`, `ROADMAP.md`, `SPECIFICATION.md`, `TESTING.md`, dan `DECISIONS.md`.
-2. Periksa branch, commit terbaru, struktur file, workflow, serta hasil tes/build yang benar-benar tersedia di GitHub.
-3. Periksa status workflow GitHub Actions sebelum menyimpulkan CI berhasil atau gagal.
-4. Pilih tugas paling awal yang belum selesai menurut roadmap.
-5. Kerjakan dalam perubahan kecil yang bisa diperiksa; jangan mengulang pekerjaan yang sudah terbukti selesai.
-6. Jalankan pemeriksaan yang relevan dan catat hasil aktualnya.
-7. Perbarui dokumen checkpoint ini setelah perubahan diverifikasi.
-
-## Langkah berikutnya
-1. Periksa hasil akhir run CI yang sedang berjalan dan perbaiki kegagalan bila ada.
-2. Tambahkan Gradle Wrapper setelah jalur bootstrap tersedia, lalu ubah CI untuk menggunakan `./gradlew`.
-3. Lanjutkan ke skema database dan aturan usaha sesuai `ROADMAP.md`.
+## Lanjutkan dari sini
+1. Periksa workflow Actions terbaru dan log per langkah.
+2. Pastikan semua unit test lulus, APK bisa dibangun, isi APK valid, dan artifact tersedia.
+3. Perbaiki error CI bila ada, lalu jalankan ulang.
+4. Setelah CI lulus, uji input, edit historis, FIFO, pengeluaran, laporan, dan backup/restore pada HP.
+5. Jangan menyebut build, fitur, atau hasil tes berhasil tanpa bukti aktual.

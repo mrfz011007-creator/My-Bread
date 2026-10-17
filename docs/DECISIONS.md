@@ -34,3 +34,9 @@ Dokumen ini menyimpan keputusan yang memengaruhi rancangan agar sesi berikutnya 
 ## Batasan cakupan awal
 - **Keputusan:** aplikasi offline-first, tanpa login, server/backend, Firebase, Kotlin, Jetpack Compose, atau API AI pada versi awal.
 - **Konsekuensi:** fokus pada pencatatan lokal, konsistensi data, dan APK yang dapat dibangun berulang melalui CI.
+
+
+## 2026-10-17 — Perubahan catatan lama dan stok berantai
+- **Keputusan:** bila catatan pada tanggal lama diubah, perhitungan stok awal pada tanggal berikutnya dihitung ulang secara berantai dalam satu transaksi database.
+- **Alasan:** riwayat tidak boleh mempertahankan saldo stok yang menjadi tidak konsisten setelah perubahan data sebelumnya.
+- **Perlindungan:** pengguna mendapat peringatan sebelum menyimpan perubahan historis. Jika penjualan/kerusakan pada hari berikutnya melebihi stok yang dihitung ulang, seluruh transaksi dibatalkan. Koreksi jumlah fisik harus dicatat sebagai penyesuaian stok dengan alasan, bukan penjualan/kerusakan.

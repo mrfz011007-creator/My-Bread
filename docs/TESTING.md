@@ -1,54 +1,28 @@
 # Pengujian dan Verifikasi My Bread
 
-## Status awal
-Fondasi source Android dan workflow CI sudah ditambahkan. GitHub Actions telah membuat beberapa workflow run untuk commit terbaru, tetapi saat pemeriksaan terakhir run yang terlihat masih berstatus berjalan. Karena itu **hasil build, tes, dan artifact belum terverifikasi**.
+## Bukti CI dasar
+- [Run #6 pada main](https://github.com/mrfz011007-creator/My-Bread/actions/runs/38818735292): sukses; unit test, build APK debug, dan unggah artifact.
+- [Run #7 pada feature/business-calculations](https://github.com/mrfz011007-creator/My-Bread/actions/runs/38994628719): sukses; kalkulator/FIFO, build APK debug, dan unggah artifact.
+- [Run #8 pada main](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39043933306): sukses; branch main setelah merge kalkulator/FIFO.
+- [Run #9 pada build/gradle-wrapper-8.9](https://github.com/mrfz011007-creator/My-Bread/actions/runs/39044127980): sukses untuk perubahan wrapper/CI saja. Bukti ini bukan validasi kode database/UI setelah perubahan berikutnya.
 
-## Prinsip bukti
-Untuk setiap klaim build atau tes, catat:
-- commit yang diuji;
-- perintah atau workflow yang dijalankan;
-- hasil aktual (lulus/gagal);
-- tautan log workflow atau artifact jika tersedia;
-- kegagalan dan tindak lanjutnya.
+## Workflow sekarang
+- Java 17.
+- Gradle Wrapper 8.9 di-commit ke repository.
+- Menjalankan `./gradlew --no-daemon --console=plain testDebugUnitTest`.
+- Memeriksa laporan XML agar jumlah tes tidak nol dan tidak ada failure/error.
+- Menjalankan `./gradlew --no-daemon --console=plain assembleDebug`.
+- Memastikan APK tidak kosong, arsip ZIP APK valid, dan `classes.dex` tersedia.
+- Mengunggah `app-debug.apk` sebagai artifact selama 14 hari.
 
-## Lapisan tes yang direncanakan
-1. **Unit test logika bisnis:** rumus uang, validasi kuantitas, dan kalkulasi ringkasan.
-2. **Database test:** pembuatan skema, pembacaan/penulisan, foreign key, migrasi, transaksi, dan rollback.
-3. **Tes FIFO:** roti terjual mengurangi lot tertua lebih dahulu; roti rusak juga mengurangi lot tertua.
-4. **Tes riwayat:** tanggal yang sama memperbarui catatan yang ada; edit tanggal lama menghitung ulang dampak tanggal selanjutnya.
-5. **Tes pengeluaran:** banyak item per hari, edit item, total pengeluaran, dan penyimpanan atomik.
-6. **Tes backup/restore:** backup valid, berkas rusak/tidak kompatibel, konfirmasi, dan pemulihan gagal tanpa menghilangkan data lama.
-7. **Build CI:** build dari keadaan repository yang bersih di GitHub Actions dan unggah APK artifact.
-8. **Pemeriksaan manual:** alur utama di perangkat Android bila perangkat/emulator tersedia.
+## Cakupan tes pada branch integrasi
+1. Hitungan modal, omzet, margin, expense total, batas input, dan overflow.
+2. FIFO untuk stok lama, stok baru, serta penyesuaian stok bertanda.
+3. SQLite: menyimpan beberapa item pengeluaran dan penyesuaian stok.
+4. Edit catatan lama mengubah stok awal hari-hari berikutnya secara atomik.
+5. Edit yang membuat stok lanjutan tidak cukup harus rollback tanpa mengubah data sebelumnya.
+6. Backup/restore berhasil dan backup tidak valid ditolak sebelum data lama diganti.
+7. Build bersih menghasilkan APK yang valid dan artifact yang dapat diunduh.
 
-## Kasus penerimaan minimum
-- Nilai negatif ditolak.
-- Penjualan + roti rusak tidak melebihi stok yang tersedia.
-- FIFO berlaku untuk penjualan dan roti rusak.
-- Kegagalan penyimpanan membatalkan seluruh perubahan terkait.
-- Catatan tanggal yang sama tidak terduplikasi.
-- Edit catatan lama tidak meninggalkan stok tanggal berikutnya dalam keadaan tidak valid.
-- Restore backup gagal tidak mengubah data lokal sebelumnya.
-- Build CI sukses dan artifact APK benar-benar tersedia sebelum menyatakan APK berhasil dibangun.
-
-## Status workflow awal
-Workflow: `.github/workflows/android-ci.yml`
-- Menyiapkan Java 17.
-- Memasang Gradle 8.9 menggunakan `gradle/actions/setup-gradle@v4` karena wrapper belum ada.
-- Menjalankan `gradle testDebugUnitTest`.
-- Menjalankan `gradle assembleDebug`.
-- Mengunggah `app/build/outputs/apk/debug/app-debug.apk` sebagai artifact.
-
-Status run: sudah terpicu, tetapi hasil akhir belum tersedia pada saat checkpoint terakhir. Periksa halaman Actions sebelum melanjutkan.
-
-## Format catatan hasil
-Tambahkan catatan ringkas per commit atau milestone:
-- Tanggal:
-- Commit:
-- Cakupan:
-- Perintah/workflow:
-- Hasil aktual:
-- Bukti:
-- Masalah tersisa:
-
-Jangan mengarang hasil yang tidak tersedia. Jika tes tidak bisa dijalankan, tulis dengan jelas bahwa tes belum dijalankan dan alasannya.
+## Kriteria penerimaan
+Catat SHA commit, status workflow, hasil unit test, hasil build, dan tautan artifact. Build hanya dinyatakan berhasil bila langkah build dan pemeriksaan APK lulus serta artifact tersedia. APK belum dianggap teruji pada perangkat sampai alur utama diuji di HP Android.
