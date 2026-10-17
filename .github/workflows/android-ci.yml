@@ -16,28 +16,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Gradle 8.9
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-          cache-provider: basic
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Run unit tests
-        run: gradle testDebugUnitTest
+        run: ./gradlew --no-daemon --console=plain testDebugUnitTest
+
+      - name: Verify unit test results
+        if: success()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          report_dir = Path("app/build/test-results/testDebugUnitTest")
+          reports = sorted(report_dir.glob("TEST-*.xml"))
+          if not reports:
+              raise SystemExit("ERROR: Gradle produced no JUnit XML test reports.")
+
+          tests = failures = errors = skipped = 0
+          for report in reports:
+              root = ET.parse(report).getroot()
+              tests += int(root.attrib.get("tests", "0"))
+              failures += int(root.attrib.get("failures", "0"))
+              errors += int(root.attrib.get("errors", "0"))
+              skipped += int(root.attrib.get("skipped", "0"))
+
+          print(f"JUnit results: {tests} tests, {failures} failures, {errors} errors, {skipped} skipped.")
+          if tests == 0:
+              raise SystemExit("ERROR: No unit tests were executed.")
+          if failures or errors:
+              raise SystemExit("ERROR: Unit tests failed.")
+          PY
 
       - name: Build debug APK
-        run: gradle assembleDebug
+        run: ./gradlew --no-daemon --console=plain assembleDebug
 
       - name: Upload debug APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: My-Bread-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
