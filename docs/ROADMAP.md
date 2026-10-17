@@ -1,68 +1,58 @@
 # Roadmap My Bread
 
-Roadmap ini adalah urutan kerja dan kriteria penerimaan. Tugas tidak dianggap selesai hanya karena kode ditulis; hasil harus diverifikasi.
+Tugas tidak dianggap selesai hanya karena source ditulis. Verifikasi dengan CI, tes yang sesuai, dan pemeriksaan APK.
 
-## Milestone 00 — Spesifikasi dan fondasi
-- [x] Catat spesifikasi awal dan aturan bisnis.
-- [x] Tetapkan checkpoint dan prosedur melanjutkan pekerjaan.
-- [x] Buat struktur proyek Android minimal menggunakan Java dan XML.
-- [x] Tambahkan konfigurasi Gradle awal.
-- [x] Tambahkan workflow GitHub Actions untuk tes, build APK, dan unggah artifact.
-- [ ] Tambahkan Gradle Wrapper; saat ini workflow memasang Gradle 8.9 secara langsung.
-- [ ] Buktikan tes dan build berhasil di CI.
-**Status:** sebagian besar fondasi source sudah dibuat, tetapi milestone belum selesai karena wrapper dan bukti CI belum ada.
-**Selesai jika:** source project tersedia, wrapper terkonfigurasi, workflow berjalan, tes lulus, dan log/artifact menunjukkan hasil aktual.
+## Milestone 00 — Fondasi dan CI
+- [x] Spesifikasi, keputusan, dan roadmap terdokumentasi.
+- [x] Fondasi Android Java/XML dan workflow Android CI.
+- [x] Build/tes lama terverifikasi pada run #6 dan run #7.
+- [x] Wrapper script dan konfigurasi versi 8.9 ditambahkan; CI membangkitkan wrapper JAR dari Gradle yang dipin.
+- [ ] Wrapper JAR diperiksa sebagai bagian permanen repository.
+- [ ] CI untuk perubahan integrasi terbaru lulus.
+**Selesai jika:** workflow bersih menjalankan `./gradlew`, semua tes relevan lulus, dan artifact bisa diunduh.
 
-## Milestone 01 — Build APK berulang
-- [ ] Workflow dapat membangun APK dari keadaan repository yang bersih.
-- [ ] APK debug diunggah sebagai artifact GitHub Actions.
-- [ ] Nama artifact dan petunjuk pengambilan APK didokumentasikan.
-- [ ] Build dapat diulang tanpa bergantung pada file lokal yang tidak dilacak Git.
-**Selesai jika:** workflow sukses dan APK artifact benar-benar tersedia serta dapat diunduh.
+## Milestone 01 — Perhitungan bisnis dan FIFO
+- [x] Perhitungan modal, omzet, margin kotor, expenses, selisih kas.
+- [x] FIFO untuk roti terjual dan roti rusak.
+- [x] Penyesuaian stok terpisah dari penjualan/kerusakan.
+- [x] Tes unit awal dan kasus batas ditambahkan.
+- [ ] Verifikasi ulang melalui CI setelah integrasi database.
+**Selesai jika:** seluruh tes bisnis/FIFO lulus.
 
-## Milestone 02 — Database dan aturan usaha
-- [ ] Rancang skema SQLite dan migrasi versi database.
-- [ ] Simpan catatan harian, pengeluaran, lot stok, dan penyesuaian stok.
-- [ ] Terapkan validasi kuantitas serta aturan FIFO.
-- [ ] Terapkan transaksi atomik untuk penyimpanan dan perubahan data terkait.
-- [ ] Tambahkan tes unit/database untuk hitungan, stok, FIFO, dan kegagalan transaksi.
-**Selesai jika:** tes otomatis mencakup aturan bisnis penting dan seluruh tes relevan lulus.
+## Milestone 02 — Database dan integritas data
+- [x] Tabel SQLite untuk catatan harian, pengeluaran, dan penyesuaian.
+- [x] Penyimpanan atomik dan upsert berdasarkan tanggal.
+- [x] Edit tanggal lama memperbarui opening stock catatan berikutnya di dalam transaksi yang sama.
+- [x] Tes Robolectric untuk integritas data, edit berantai, rollback, dan backup.
+- [ ] CI terbaru terverifikasi.
+**Selesai jika:** tes database lulus dan operasi gagal tidak merusak data lama.
 
-## Milestone 03 — Pencatatan harian dan dashboard
-- [ ] Buat dashboard ringkasan.
-- [ ] Buat formulir pencatatan harian dengan pratinjau perhitungan.
-- [ ] Validasi input dan cegah penyimpanan catatan yang tidak valid.
-- [ ] Tampilkan stok sisa dan rincian hitungan.
-**Selesai jika:** alur input, validasi, simpan, buka kembali, dan ringkasan diuji pada perangkat/emulator atau melalui tes yang sesuai.
+## Milestone 03 — Formulir dan dashboard
+- [x] Dashboard ringkasan keuangan, stok, dan grafik omzet tujuh hari.
+- [x] Formulir harian dengan pengeluaran berulang, penyesuaian stok, pratinjau langsung, validasi, dan penyimpanan.
+- [ ] Verifikasi UX dan input pada HP.
 
 ## Milestone 04 — Riwayat dan laporan
-- [ ] Tampilkan daftar catatan berdasarkan tanggal.
-- [ ] Izinkan pengeditan catatan lama dan pengeluaran.
-- [ ] Saat catatan lama diubah, hitung ulang dampak pada tanggal sesudahnya.
-- [ ] Tolak atau tangani dengan aman perubahan yang membuat stok berikutnya tidak valid.
-- [ ] Tampilkan laporan dan grafik ringkas.
-**Selesai jika:** tes membuktikan data tanggal lain tidak tertimpa, tidak ada duplikasi tanggal, dan perubahan berantai ditangani benar.
+- [x] Riwayat catatan dan alur edit tanggal lama.
+- [x] Ringkasan bulanan dan grafik omzet.
+- [ ] Uji manual pada HP, termasuk edit historis dan perubahan stok berantai.
 
 ## Milestone 05 — Backup dan pemulihan
-- [ ] Ekspor data ke berkas backup.
-- [ ] Validasi format dan isi backup sebelum pemulihan.
-- [ ] Tampilkan pratinjau dan minta konfirmasi sebelum mengganti data lokal.
-- [ ] Pulihkan data secara atomik; bila berkas tidak valid atau pemulihan gagal, data lama tetap utuh.
-- [ ] Tambahkan tes untuk backup valid, backup rusak, dan kegagalan pemulihan.
-**Selesai jika:** seluruh skenario pemulihan lulus dan kegagalan tidak merusak data yang ada.
+- [x] Ekspor JSON.
+- [x] Validasi backup, pratinjau, konfirmasi eksplisit, dan transaksi pemulihan.
+- [x] Tes backup/restore dan penolakan backup tidak valid.
+- [ ] Uji impor/ekspor melalui pemilih berkas Android pada HP.
 
-## Milestone 06 — Audit dan rilis
-- [ ] Jalankan seluruh tes otomatis.
-- [ ] Periksa validasi, transaksi database, migrasi, penanganan error, dan privasi data.
-- [ ] Verifikasi build bersih dan APK artifact.
-- [ ] Uji alur utama di perangkat Android bila memungkinkan.
-- [ ] Dokumentasikan batasan yang belum terselesaikan.
-**Selesai jika:** hasil audit dan build punya bukti, masalah kritis ditangani, dan cara instalasi APK jelas.
+## Milestone 06 — Audit akhir
+- [ ] Jalankan ulang tes lengkap dan build bersih pada branch final.
+- [ ] Periksa artifact APK dan catat commit.
+- [ ] Uji APK di perangkat Android.
+- [ ] Perbarui checkpoint dengan hasil aktual.
+- [ ] Gabungkan ke main hanya setelah CI lulus dan perubahan diperiksa.
 
-## Aturan pengerjaan
-- Kerjakan milestone secara berurutan kecuali ada dependensi yang terdokumentasi.
-- Hindari refactor besar yang tidak dibutuhkan.
-- Jangan menambahkan layanan online atau dependensi berat tanpa alasan.
-- Jangan pernah menyimpan token, kata sandi, atau rahasia di source code.
+## Batasan
+- Offline-first; data disimpan lokal.
+- Jangan menaruh rahasia di repository.
 - Jangan mengubah proyek RotiKu.
-- Setiap perubahan harus punya pemeriksaan yang sesuai dan checkpoint terbaru.
+- Harga default: modal Rp1.400, jual Rp2.500, margin kotor awal Rp1.100.
+- Selisih kas bukan laba bersih selama masih ada stok yang belum terjual.
