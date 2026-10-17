@@ -19,13 +19,13 @@ Nilai harga sebaiknya disimpan/diatur secara konsisten agar perubahan harga di m
 ## 3. Input catatan harian
 Setiap catatan harian dapat mencakup:
 - Tanggal.
-- Stok sisa dari hari sebelumnya yang dibawa hari ini, dimasukkan manual oleh pengguna.
+- Stok sisa dari hari sebelumnya yang dibawa hari ini. Untuk catatan baru, aplikasi memberi nilai awal dari hasil hari sebelumnya; pengguna dapat mencatat koreksi fisik lewat penyesuaian stok yang memiliki alasan.
 - Jumlah roti baru yang dibeli hari ini.
 - Jumlah roti terjual.
 - Jumlah roti rusak/tidak layak.
 - Daftar pengeluaran dengan keterangan dan nominal; satu hari dapat memiliki beberapa pengeluaran.
 
-Stok sisa hari sebelumnya tidak otomatis diisi sebagai input hari ini. Aplikasi boleh menampilkan sisa hari sebelumnya sebagai referensi.
+Saat catatan tanggal lama diedit, stok awal pada catatan berikutnya dihitung ulang berantai dari stok akhir terbaru. Jika jumlah fisik berbeda, catat selisih sebagai penyesuaian stok dengan alasan; jangan mengubah penyesuaian menjadi penjualan atau roti rusak.
 
 ## 4. Aturan stok dan FIFO
 - Stok lama dan stok baru harus dapat dilacak sebagai lot terpisah.

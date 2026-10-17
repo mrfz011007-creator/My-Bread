@@ -23,6 +23,27 @@ public class StockFifoCalculatorTest {
         assertEquals(0, result.getTotalRemainingStock());
     }
 
+    @Test public void positiveAdjustmentIsKeptAsNewStock() {
+        StockFifoCalculator.Result result =
+                StockFifoCalculator.calculateEndingStockWithAdjustment(5, 7, 6, 0, 4);
+        assertEquals(0, result.getRemainingOldStock());
+        assertEquals(10, result.getRemainingNewStock());
+        assertEquals(10, result.getTotalRemainingStock());
+    }
+
+    @Test public void negativeAdjustmentRemovesOldStockFirst() {
+        StockFifoCalculator.Result result =
+                StockFifoCalculator.calculateEndingStockWithAdjustment(20, 30, 5, 5, -12);
+        assertEquals(0, result.getRemainingOldStock());
+        assertEquals(28, result.getRemainingNewStock());
+        assertEquals(28, result.getTotalRemainingStock());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsAdjustmentBeyondRemainingStock() {
+        StockFifoCalculator.calculateEndingStockWithAdjustment(2, 3, 4, 0, -2);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void rejectsOutgoingAboveAvailableStock() {
         StockFifoCalculator.calculateEndingStock(2, 3, 4, 2);

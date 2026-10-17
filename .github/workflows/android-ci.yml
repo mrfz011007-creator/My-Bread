@@ -60,6 +60,12 @@ jobs:
       - name: Build debug APK
         run: ./gradlew --no-daemon --console=plain assembleDebug
 
+      - name: Verify debug APK contents
+        run: |
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          unzip -t app/build/outputs/apk/debug/app-debug.apk
+          unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -q 'classes.dex'
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v7
         with:
