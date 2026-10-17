@@ -67,6 +67,9 @@ public final class MainActivity extends Activity {
     private LinearLayout expensesContainer;
     private LinearLayout adjustmentsContainer;
     private TextView previewText;
+    private Button saveButton;
+    private String initialBundleFingerprint;
+    private BreadDatabaseHelper.DayBundle initialBundle;
     private final List<ExpenseRow> expenseRows = new ArrayList<>();
     private final List<AdjustmentRow> adjustmentRows = new ArrayList<>();
 
@@ -393,9 +396,9 @@ public final class MainActivity extends Activity {
         TextView note = text("Catatan: modal dihitung dari seluruh roti baru yang dibawa. Selisih kas bukan laba bersih.", 12, COLOR_MUTED, false);
         content.addView(note, fullWidthParams());
 
-        Button save = button(editingExisting ? "Simpan perubahan" : "Simpan catatan", true);
-        save.setOnClickListener(v -> requestSaveDay());
-        content.addView(save, fullWidthParams());
+        saveButton = button(editingExisting ? "Simpan perubahan" : "Simpan catatan", true);
+        saveButton.setOnClickListener(v -> requestSaveDay());
+        content.addView(saveButton, fullWidthParams());
         Button cancel = button("Batal", false);
         cancel.setOnClickListener(v -> {
             if (!today().equals(editingDate)) showHistory(); else showDashboard();
@@ -411,6 +414,8 @@ public final class MainActivity extends Activity {
         newBreadField.addTextChangedListener(watcher);
         soldField.addTextChangedListener(watcher);
         damagedField.addTextChangedListener(watcher);
+        initialBundle = saved;
+        initialBundleFingerprint = bundleFingerprint(collectBundle());
         updatePreview();
     }
 
@@ -532,7 +537,11 @@ public final class MainActivity extends Activity {
                 editingDate, opening, fresh, sold, damaged,
                 BreadBusinessCalculator.DEFAULT_COST_PER_BREAD,
                 BreadBusinessCalculator.DEFAULT_SELLING_PRICE_PER_BREAD);
-        return new BreadDatabaseHelper.DayBundle(record, collectExpenses(), collectAdjustments());
+        BreadDatabaseHelper.DayBundle bundle = new BreadDatabaseHelper.DayBundle(
+                record, collectExpenses(), collectAdjustments());
+        bundle.record.expenseTotal = expenseTotal(bundle.expenses);
+        bundle.record.adjustmentNet = adjustmentTotal(bundle.adjustments);
+        return bundle;
     }
 
     private long expenseTotal(List<BreadDatabaseHelper.ExpenseItem> items) {
@@ -547,16 +556,66 @@ public final class MainActivity extends Activity {
         return Math.toIntExact(total);
     }
 
+    private String bundleFingerprint(BreadDatabaseHelper.DayBundle bundle) {
+        StringBuilder out = new StringBuilder();
+        appendFingerprintToken(out, bundle.record.date);
+        appendFingerprintToken(out, String.valueOf(bundle.record.previousLeftover));
+        appendFingerprintToken(out, String.valueOf(bundle.record.newBreadQuantity));
+        appendFingerprintToken(out, String.valueOf(bundle.record.soldQuantity));
+        appendFingerprintToken(out, String.valueOf(bundle.record.damagedQuantity));
+        appendFingerprintToken(out, String.valueOf(bundle.record.costPerBread));
+        appendFingerprintToken(out, String.valueOf(bundle.record.sellingPrice));
+        appendFingerprintToken(out, String.valueOf(bundle.expenses.size()));
+        for (BreadDatabaseHelper.ExpenseItem item : bundle.expenses) {
+            appendFingerprintToken(out, item.description.trim());
+            appendFingerprintToken(out, String.valueOf(item.amount));
+        }
+        appendFingerprintToken(out, String.valueOf(bundle.adjustments.size()));
+        for (BreadDatabaseHelper.StockAdjustment item : bundle.adjustments) {
+            appendFingerprintToken(out, String.valueOf(item.quantity));
+            appendFingerprintToken(out, item.reason.trim());
+        }
+        return out.toString();
+    }
+
+    private void appendFingerprintToken(StringBuilder out, String value) {
+        out.append(value.length()).append(':').append(value).append(';');
+    }
+
+    private void setSaveEnabled(boolean enabled) {
+        if (saveButton == null) return;
+        saveButton.setEnabled(enabled);
+        saveButton.setAlpha(enabled ? 1.0f : 0.62f);
+        saveButton.setTextColor(enabled ? Color.WHITE : COLOR_MUTED);
+        saveButton.setBackground(background(
+                enabled ? COLOR_GREEN : COLOR_LIGHT_GREEN, 12, 0));
+    }
+
+    private boolean isSignificantChange(
+            BreadDatabaseHelper.DayBundle before, BreadDatabaseHelper.DayBundle after) {
+        if (before == null || after == null) return false;
+        BreadDatabaseHelper.DailyRecord old = before.record;
+        BreadDatabaseHelper.DailyRecord current = after.record;
+        return old.previousLeftover != current.previousLeftover
+                || old.newBreadQuantity != current.newBreadQuantity
+                || old.soldQuantity != current.soldQuantity
+                || old.damagedQuantity != current.damagedQuantity
+                || old.getModal() != current.getModal()
+                || old.getRevenue() != current.getRevenue()
+                || old.getGrossMargin() != current.getGrossMargin()
+                || old.getEndingStock() != current.getEndingStock()
+                || old.expenseTotal != current.expenseTotal
+                || old.adjustmentNet != current.adjustmentNet;
+    }
+
     private void updatePreview() {
         if (previewText == null || previousLeftoverField == null) return;
         try {
             BreadDatabaseHelper.DayBundle bundle = collectBundle();
             BreadDatabaseHelper.DailyRecord record = bundle.record;
-            record.expenseTotal = expenseTotal(bundle.expenses);
-            int netAdjustment = adjustmentTotal(bundle.adjustments);
             int stock = StockFifoCalculator.calculateEndingStockWithAdjustment(
                     record.previousLeftover, record.newBreadQuantity, record.soldQuantity,
-                    record.damagedQuantity, netAdjustment).getTotalRemainingStock();
+                    record.damagedQuantity, record.adjustmentNet).getTotalRemainingStock();
             previewText.setText(
                     "Modal: " + money(record.getModal()) +
                     "\nOmzet: " + money(record.getRevenue()) +
@@ -565,9 +624,12 @@ public final class MainActivity extends Activity {
                     "\nSelisih kas: " + money(record.getCashDifference()) +
                     "\nPerkiraan sisa stok: " + stock + " roti");
             previewText.setTextColor(COLOR_TEXT);
+            setSaveEnabled(initialBundleFingerprint != null
+                    && !bundleFingerprint(bundle).equals(initialBundleFingerprint));
         } catch (RuntimeException invalid) {
             previewText.setText("Input belum valid: " + invalid.getMessage());
             previewText.setTextColor(Color.rgb(160, 54, 40));
+            setSaveEnabled(false);
         }
     }
 
@@ -587,12 +649,25 @@ public final class MainActivity extends Activity {
         }
 
         int affected = editingExisting ? database.getFollowingDaysCount(editingDate) : 0;
-        if (affected > 0) {
+        boolean significant = editingExisting && isSignificantChange(initialBundle, bundle);
+        if (affected > 0 || significant) {
+            StringBuilder message = new StringBuilder();
+            if (significant) {
+                message.append("Perubahan ini mengubah ringkasan keuangan atau stok hari ini. ");
+            }
+            if (affected > 0) {
+                message.append("Ada ").append(affected).append(" catatan setelah ")
+                        .append(editingDate)
+                        .append(". Stok awal hari berikutnya akan dihitung ulang berantai. ");
+                message.append("Jika penjualan/roti rusak menjadi melebihi stok, seluruh simpan dibatalkan.");
+            } else {
+                message.append("Periksa kembali jumlah dan ringkasan sebelum menyimpan.");
+            }
             new AlertDialog.Builder(this)
-                    .setTitle("Perubahan memengaruhi hari berikutnya")
-                    .setMessage("Ada " + affected + " catatan setelah " + editingDate +
-                            ". Stok awal hari berikutnya akan dihitung ulang berantai. " +
-                            "Jika penjualan/roti rusak menjadi melebihi stok, penyimpanan dibatalkan.")
+                    .setTitle(affected > 0
+                            ? "Perubahan memengaruhi hari berikutnya"
+                            : "Konfirmasi perubahan penting")
+                    .setMessage(message.toString())
                     .setNegativeButton("Batal", null)
                     .setPositiveButton("Lanjut simpan", (dialog, which) -> saveBundle(bundle))
                     .show();
